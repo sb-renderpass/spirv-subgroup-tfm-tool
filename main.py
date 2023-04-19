@@ -138,6 +138,7 @@ class Module:
 
     def __init__(self, data):
         self.instructions = [Inst(line.strip()) for line in data]
+        self.indents = [' ' * (len(line) - len(line.lstrip())) for line in data]
         self.leaders = calculate_leaders(self.instructions)
 
     def __repr__(self):
@@ -152,8 +153,9 @@ class Module:
 
     def append(self, opcode, inst):
         # TODO Only insert if not in instruction list
-        self.instructions.insert(
-            find_last_inst(self.instructions, opcode)[0] + 1, inst)
+        loc = find_last_inst(self.instructions, opcode)[0]
+        self.instructions.insert(loc + 1, inst)
+        self.indents.insert(loc + 1, self.indents[loc])
         self._update(inst)
 
     def disable(self, n):
@@ -164,8 +166,8 @@ class Module:
 
     def save(self, filename):
         with open(filename, 'w') as out_file:
-            for inst in self.instructions:
-                line = f'{str(inst)}\n'
+            for indents, inst in zip(self.indents, self.instructions):
+                line = f'{indents}{str(inst)}\n'
                 out_file.write(line)
 
     def _update(self, inst):
@@ -273,8 +275,8 @@ def replace_rw_pair_with_broadcast(module, rw_pairs):
 
 def main():
     parser = argparse.ArgumentParser('transform')
-    parser.add_argument('-i', '--input',   type=str, default='source.txt')
-    parser.add_argument('-o', '--output',  type=str, default='transform.txt')
+    parser.add_argument('-i', '--input',   type=str, default='before.comp.spvasm')
+    parser.add_argument('-o', '--output',  type=str, default='after.comp.spvasm')
     parser.add_argument('-v', '--verbose', action=argparse.BooleanOptionalAction, default=False)
     args = parser.parse_args()
 
