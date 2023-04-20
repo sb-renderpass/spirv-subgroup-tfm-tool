@@ -151,6 +151,11 @@ class Module:
         self.instructions[n] = inst
         self._update(inst)
 
+    def move(self, old_loc, inst, new_loc):
+        self.instructions.insert(new_loc, inst)
+        self.indents.insert(new_loc, self.indents[old_loc])
+        self.disable(old_loc) # Internally does an update
+
     def append(self, opcode, inst):
         # TODO Only insert if not in instruction list
         loc = find_last_inst(self.instructions, opcode)[0]
@@ -159,10 +164,10 @@ class Module:
         self._update(inst)
 
     def disable(self, n):
-        inst = copy.deepcopy(self.instructions[n])
-        inst.opcode = f'; (NOP) {inst.opcode}'
-        self.instructions[n] = inst
-        self._update(inst)
+        # TODO: Append original instruction in comment?
+        self.instructions[n] = Inst('; NOP')
+        self.indents[n] = ''
+        self._update(self.instructions[n])
 
     def save(self, filename):
         with open(filename, 'w') as out_file:
@@ -268,9 +273,26 @@ def find_all_thread_shared_rd(module):
 
 def replace_rw_pair_with_broadcast(module, rw_pairs):
     for (rd_n, rd_inst, data_type), (wr_n, wr_inst, tid) in rw_pairs:
+        # Check if the write instruction uses value from memory instead of a constant
+        st_src_inst = find_result_id(module.instructions, wr_inst.get_src())
+        is_memory = st_src_inst[1].is_ld()
+        if is_memory:
+            ld_src_inst = find_result_id(module.instructions, st_src_inst[1].get_src())
+
+        # Disable write to shared memory
         module.disable(wr_n)
+
+        # Replace read from shared memory with subgroup broadcast
         module.set(rd_n, Inst.make_broadcast(
             wr_inst.get_src(), rd_inst.get_dst(), tid, data_type))
+
+        # Move read from memory location above broadcast
+        # Necessary for validation as IDs must be in the same block
+        # Permits optimization as well
+        if is_memory:
+            module.move(*ld_src_inst, rd_n - 2)
+            module.move(*st_src_inst, rd_n - 1)
+
         log(module.get(rd_n))
 
 def main():

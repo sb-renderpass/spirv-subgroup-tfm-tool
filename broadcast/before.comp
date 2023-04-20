@@ -21,6 +21,7 @@ void main()
 {
 	if (gl_LocalInvocationID.x == TID)
 	{
+		//s_value = 47;
 		s_value = in_value;
 	}
 	groupMemoryBarrier();
