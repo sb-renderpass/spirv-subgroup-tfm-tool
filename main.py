@@ -400,7 +400,7 @@ def apply_reduce(module, reduce_insts):
         '''
 
 def main():
-    parser = argparse.ArgumentParser('transform')
+    parser = argparse.ArgumentParser('SPIRV subgroup transformation')
     parser.add_argument('-i', '--input',   type=str, default='before.comp.spvasm')
     parser.add_argument('-o', '--output',  type=str, default='after.comp.spvasm')
     parser.add_argument('-v', '--verbose', action=argparse.BooleanOptionalAction, default=False)

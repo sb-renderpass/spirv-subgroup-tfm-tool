@@ -72,12 +72,12 @@ def run(filename, verbose, validate, optimize, show):
         check=True)
 
 def main():
-    parser = argparse.ArgumentParser('SPIRV subgroup transform')
+    parser = argparse.ArgumentParser('SPIRV subgroup transformation')
     parser.add_argument('filename',   type=pathlib.Path)
-    parser.add_argument('--verbose',  action=argparse.BooleanOptionalAction, default=False)
-    parser.add_argument('--validate', action=argparse.BooleanOptionalAction, default=False)
-    parser.add_argument('--optimize', action=argparse.BooleanOptionalAction, default=True)
-    parser.add_argument('--show',     action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument('--validate', action=argparse.BooleanOptionalAction, default=False, help='Validate transformed SPIRV assembly')
+    parser.add_argument('--optimize', action=argparse.BooleanOptionalAction, default=True,  help='Optimize transformed SPIRV assembly')
+    parser.add_argument('--show',     action=argparse.BooleanOptionalAction, default=False, help='Display cross-compiled GLSL code')
+    parser.add_argument('--verbose',  action=argparse.BooleanOptionalAction, default=False, help='Display additional debug logs')
     args = parser.parse_args()
 
     try:
