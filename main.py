@@ -323,12 +323,24 @@ def find_all_thread_atomic_wr(module):
             result.append((n, inst, data_type, op))
     return result
 
+def disable_iequal(module, iequal_inst):
+    inst = find_result_id(module.instructions, iequal_inst[1].get_src()[0])
+    if inst[1].is_const():
+        iequal_inst[1].operands[-1] = iequal_inst[1].operands[-2]
+    else:
+        iequal_inst[1].operands[-2] = iequal_inst[1].operands[-1]
+    module.set(*iequal_inst)
+
 def apply_broadcast(module, broadcast_insts):
-    for (wr_n, wr_inst, tid, _), \
+    for (wr_n, wr_inst, tid, wr_cbr), \
         (rd_n, rd_inst, data_type) in broadcast_insts:
 
         # Disable write to shared memory
         module.disable(wr_n)
+
+        # Disable comparision so optimizer removes if-loop
+        #iequal_inst = find_result_id(module.instructions, wr_cbr[1].get_src())
+        #disable_iequal(module, iequal_inst)
 
         # Replace read from shared memory with subgroup broadcast
         module.set(rd_n, Inst.make_broadcast(
@@ -341,14 +353,6 @@ def apply_broadcast(module, broadcast_insts):
             ld_src_inst = find_result_id(module.instructions, st_src_inst[1].get_src())
             module.move(*ld_src_inst, rd_n - 2)
             module.move(*st_src_inst, rd_n - 1)
-
-def disable_iequal(module, iequal_inst):
-    inst = find_result_id(module.instructions, iequal_inst[1].get_src()[0])
-    if inst[1].is_const():
-        iequal_inst[1].operands[-1] = iequal_inst[1].operands[-2]
-    else:
-        iequal_inst[1].operands[-2] = iequal_inst[1].operands[-1]
-    module.set(*iequal_inst)
 
 def apply_reduce(module, reduce_insts):
     for (wr_n, wr_inst, wr_tid, wr_cbr), \
