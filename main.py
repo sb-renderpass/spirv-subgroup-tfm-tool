@@ -15,6 +15,16 @@ def try_int(x):
     except ValueError:
         return x
 
+ATOMIC_TO_REDUCE_MAP = {
+    'OpAtomicIAdd': 'OpGroupNonUniformIAdd',
+    'OpAtomicSMin': 'OpGroupNonUniformSMin',
+    'OpAtomicSMax': 'OpGroupNonUniformSMax',
+    'OpAtomicUMin': 'OpGroupNonUniformUMin',
+    'OpAtomicUMax': 'OpGroupNonUniformUMax',
+    'OpAtomicAnd' : 'OpGroupNonUniformBitwiseAnd',
+    'OpAtomicXor' : 'OpGroupNonUniformBitwiseXor',
+    'OpAtomicOr'  : 'OpGroupNonUniformBitwiseOr',
+}
 
 class Inst:
 
@@ -49,7 +59,7 @@ class Inst:
 
     @staticmethod
     def make_reduce(src, dst, op, data_type):
-        return Inst(f'{dst} = OpGroupNonUniform{op} {data_type} %uint_3 Reduce {src}')
+        return Inst(f'{dst} = {op} {data_type} %uint_3 Reduce {src}')
 
     @staticmethod
     def make_const(name, data_type, value):
@@ -75,7 +85,7 @@ class Inst:
         return self.is_var() and self.get_storage_class() == 'Workgroup'
 
     def is_atomic(self):
-        return self.opcode in ['OpAtomicIAdd']
+        return self.opcode in ATOMIC_TO_REDUCE_MAP
 
     def is_br(self):
         return self.opcode == 'OpBranch'
@@ -319,7 +329,7 @@ def find_all_thread_atomic_wr(module):
         if  is_shared_atomic_wr(module.instructions, inst) and \
             is_in_all_thread_block(module, n):
             data_type = inst.operands[0] #TODO: Does this work for memory?
-            op = inst.opcode[8:]
+            op = ATOMIC_TO_REDUCE_MAP[inst.opcode]
             result.append((n, inst, data_type, op))
     return result
 

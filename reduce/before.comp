@@ -9,7 +9,7 @@ shared TYPE s_value;
 
 layout(std430, binding=0) readonly buffer in_value_buffer
 {
-	TYPE in_value;
+	TYPE[] in_value;
 };
 
 layout(std430, binding=1) writeonly buffer out_value_buffer
@@ -25,7 +25,10 @@ void main()
 	}
 	groupMemoryBarrier();
 
-	atomicAdd(s_value, TYPE(47));
+	//atomicAdd(s_value, TYPE(47));
+	atomicAdd(s_value, in_value[gl_LocalInvocationID.x]);
+	//atomicMax(s_value, in_value[gl_LocalInvocationID.x]);
+	//atomicXor(s_value, in_value[gl_LocalInvocationID.x]);
 	barrier();
 
 	//TYPE x;
