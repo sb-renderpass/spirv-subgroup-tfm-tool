@@ -1,0 +1,42 @@
+#version 460
+
+//#extension GL_KHR_shader_subgroup_arithmetic : enable
+
+#define TYPE int
+#define TID  11
+
+layout(local_size_x=1, local_size_y=1, local_size_z=1) in;
+
+shared TYPE s_value;
+
+layout(std430, binding=0) readonly buffer in_value_buffer
+{
+	TYPE in_value;
+};
+
+layout(std430, binding=1) writeonly buffer out_value_buffer
+{
+	TYPE[] out_value;
+};
+
+void main()
+{
+	if (gl_LocalInvocationID.x == TID)
+	{
+		s_value = 0;
+	}
+	groupMemoryBarrier();
+
+	atomicAdd(s_value, TYPE(47));
+	barrier();
+
+	TYPE x;
+	if (gl_LocalInvocationID.x == TID)
+	{
+		//out_value[gl_LocalInvocationID.x] = s_value;
+		x = s_value;
+	}
+
+	//out_value[gl_LocalInvocationID.x] = subgroupAdd(TYPE(47));
+}
+

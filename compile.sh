@@ -1,3 +1,3 @@
-spirv-as broadcast/after.comp.spvasm -o broadcast/after.comp.spv
-spirv-cross broadcast/after.comp.spv --output broadcast/after.comp --vulkan-semantics
-cat broadcast/after.comp
+spirv-as $1/after.comp.spvasm -o $1/after.comp.spv --preserve-numeric-ids
+spirv-cross $1/after.comp.spv --output $1/after.comp --vulkan-semantics
+cat $1/after.comp
