@@ -28,11 +28,11 @@ void main()
 	atomicAdd(s_value, TYPE(47));
 	barrier();
 
-	TYPE x;
+	//TYPE x;
 	if (gl_LocalInvocationID.x == TID)
 	{
-		x = s_value;
-		//out_value[gl_LocalInvocationID.x] = s_value;
+		//x = s_value;
+		out_value[gl_LocalInvocationID.x] = s_value;
 	}
 }
 

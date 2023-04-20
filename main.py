@@ -342,6 +342,14 @@ def apply_broadcast(module, broadcast_insts):
             module.move(*ld_src_inst, rd_n - 2)
             module.move(*st_src_inst, rd_n - 1)
 
+def disable_iequal(module, iequal_inst):
+    inst = find_result_id(module.instructions, iequal_inst[1].get_src()[0])
+    if inst[1].is_const():
+        iequal_inst[1].operands[-1] = iequal_inst[1].operands[-2]
+    else:
+        iequal_inst[1].operands[-2] = iequal_inst[1].operands[-1]
+    module.set(*iequal_inst)
+
 def apply_reduce(module, reduce_insts):
     for (wr_n, wr_inst, wr_tid, wr_cbr), \
         (op_n, op_inst, data_type, op), \
@@ -353,6 +361,15 @@ def apply_reduce(module, reduce_insts):
         # Disable atomic operation
         module.disable(op_n)
 
+        # Disable comparision so optimizer removes if-loop
+        iequal_inst = find_result_id(module.instructions, rd_cbr[1].get_src())
+        disable_iequal(module, iequal_inst)
+
+        # Replace read from shared memory with subgroup reduce
+        module.set(rd_n, Inst.make_reduce(
+            op_inst.get_src(), rd_inst.get_dst(), op, data_type))
+
+        '''
         # Disable read from shared memory
         module.disable(rd_n)
 
@@ -362,9 +379,11 @@ def apply_reduce(module, reduce_insts):
         module.insert(loc, Inst.make_reduce(
             op_inst.get_src(), rd_inst.get_dst(), op, data_type))
 
-        # Move the associated store instruction outside the thread block
         st_dst_inst = find_st(module.instructions, rd_inst.get_dst())
-        module.move(*st_dst_inst, loc + 1)
+        ac_inst = find_result_id(module.instructions, st_dst_inst[1].get_dst())
+        module.move(*ac_inst, loc + 1)
+        module.move(*st_dst_inst, loc + 2)
+        '''
 
 def main():
     parser = argparse.ArgumentParser('transform')

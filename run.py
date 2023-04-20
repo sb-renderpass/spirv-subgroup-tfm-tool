@@ -33,7 +33,8 @@ def run(filename, verbose, validate, optimize, show):
     subprocess.run([
         'spirv-as',
         f'{path}/{AFTER}.comp.spvasm',
-        '-o', f'{path}/{AFTER}.comp.spv'],
+        '-o', f'{path}/{AFTER}.comp.spv',
+        '--preserve-numeric-ids'],
         check=True)
 
     if validate:
