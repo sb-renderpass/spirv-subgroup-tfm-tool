@@ -1,7 +1,5 @@
 #version 460
 
-//#extension GL_KHR_shader_subgroup_arithmetic : enable
-
 #define TYPE int
 #define TID  11
 
@@ -33,10 +31,8 @@ void main()
 	TYPE x;
 	if (gl_LocalInvocationID.x == TID)
 	{
-		//out_value[gl_LocalInvocationID.x] = s_value;
 		x = s_value;
+		//out_value[gl_LocalInvocationID.x] = s_value;
 	}
-
-	//out_value[gl_LocalInvocationID.x] = subgroupAdd(TYPE(47));
 }
 

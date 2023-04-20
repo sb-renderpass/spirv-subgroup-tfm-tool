@@ -26,6 +26,7 @@ void main()
 	}
 	groupMemoryBarrier();
 
+	//TYPE x = s_value;
 	out_value[gl_LocalInvocationID.x] = s_value;
 }
 

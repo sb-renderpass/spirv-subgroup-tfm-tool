@@ -323,13 +323,9 @@ def find_all_thread_atomic_wr(module):
             result.append((n, inst, data_type, op))
     return result
 
-def replace_rw_pair_with_broadcast(module, rw_pairs):
-    for (rd_n, rd_inst, data_type), (wr_n, wr_inst, tid, _) in rw_pairs:
-        # Check if the write instruction uses value from memory instead of a constant
-        st_src_inst = find_result_id(module.instructions, wr_inst.get_src())
-        is_memory = st_src_inst[1].is_ld()
-        if is_memory:
-            ld_src_inst = find_result_id(module.instructions, st_src_inst[1].get_src())
+def apply_broadcast(module, broadcast_insts):
+    for (wr_n, wr_inst, tid, _), \
+        (rd_n, rd_inst, data_type) in broadcast_insts:
 
         # Disable write to shared memory
         module.disable(wr_n)
@@ -339,9 +335,10 @@ def replace_rw_pair_with_broadcast(module, rw_pairs):
             wr_inst.get_src(), rd_inst.get_dst(), tid, data_type))
 
         # Move read from memory location above broadcast
-        # Necessary for validation as IDs must be in the same block
-        # Permits optimization as well
-        if is_memory:
+        # if write instruction uses value from memory
+        st_src_inst = find_result_id(module.instructions, wr_inst.get_src())
+        if st_src_inst[1].is_ld():
+            ld_src_inst = find_result_id(module.instructions, st_src_inst[1].get_src())
             module.move(*ld_src_inst, rd_n - 2)
             module.move(*st_src_inst, rd_n - 1)
 
@@ -398,15 +395,15 @@ def main():
 
     ########## Broadcast ##########
 
-    rw_pairs = []
+    broadcast_insts = []
     for wr_inst in one_thread_shared_wr:
         for rd_inst in all_thread_shared_rd:
             if  wr_inst[1].get_dst() == rd_inst[1].get_src() and \
                 wr_inst[0] < rd_inst[0]:
-                rw_pairs.append((rd_inst, wr_inst))
+                broadcast_insts.append((wr_inst, rd_inst))
 
-    if rw_pairs:
-        replace_rw_pair_with_broadcast(module, rw_pairs)
+    if broadcast_insts:
+        apply_broadcast(module, broadcast_insts)
         module.append('OpConstant',   Inst.make_const('uint_3', 'uint', 3))
         module.append('OpCapability', Inst.make_capability('GroupNonUniform'))
         module.append('OpCapability', Inst.make_capability('GroupNonUniformBallot'))
