@@ -24,7 +24,7 @@ def run(filename, verbose, validate, optimize, show):
 
     subprocess.run([
         'python',
-        'main.py',
+        'tool.py',
         '-i', f'{path}/{BEFORE}.comp.spvasm',
         '-o', f'{path}/{AFTER}.comp.spvasm',
         '--verbose' if verbose else '--no-verbose'],
@@ -42,13 +42,6 @@ def run(filename, verbose, validate, optimize, show):
             'spirv-val',
             f'{path}/{AFTER}.comp.spv'],
             check=True)
-
-    subprocess.run([
-        'spirv-as',
-        f'{path}/{AFTER}.comp.spvasm',
-        '-o', f'{path}/{AFTER}.comp.spv',
-        '--preserve-numeric-ids'],
-        check=True)
 
     if optimize:
         subprocess.run([
