@@ -29,13 +29,12 @@ void main()
 	atomicAdd(s_value, in_value[gl_LocalInvocationID.x]);
 	//atomicMax(s_value, in_value[gl_LocalInvocationID.x]);
 	//atomicXor(s_value, in_value[gl_LocalInvocationID.x]);
-	barrier();
 
 	//TYPE x;
 	if (gl_LocalInvocationID.x == TID)
 	{
 		//x = s_value;
-		out_value[gl_LocalInvocationID.x] = s_value;
+		out_value[TID] = s_value;
 	}
 }
 

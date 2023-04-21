@@ -178,9 +178,9 @@ class Module:
         self.indents.insert(new_loc, self.indents[old_loc])
         self.disable(old_loc) # Internally does an update
 
-    def insert(self, loc, inst):
+    def insert(self, loc, inst, indents=' '):
         self.instructions.insert(loc, inst)
-        self.indents.insert(loc, ' ') # TODO: Calculate indent required
+        self.indents.insert(loc, indents)
         self._update(inst)
 
     def append(self, opcode, inst):
@@ -375,6 +375,29 @@ def apply_reduce(module, reduce_insts):
         # Disable atomic operation
         module.disable(op_n)
 
+        # Disable read from shared memory
+        indents = module.indents[rd_n]
+        module.disable(rd_n)
+
+        # Add subgroup reduce outside thread block
+        label_inst = find_br_dst(module.instructions, rd_cbr[1].get_dst()[1])
+        loc = label_inst[0] + 1
+        module.insert(loc, Inst.make_reduce(
+            op_inst.get_src(), rd_inst.get_dst(), op, data_type), indents)
+
+        # Move dependent store along below subgroup reduce
+        st_dst_inst = find_st(module.instructions, rd_inst.get_dst())
+        ac_inst = find_result_id(module.instructions, st_dst_inst[1].get_dst())
+        module.move(*ac_inst, loc + 1)
+        module.move(*st_dst_inst, loc + 2)
+
+        '''
+        # Disable write to shared memory
+        module.disable(wr_n)
+
+        # Disable atomic operation
+        module.disable(op_n)
+
         # Disable comparision so optimizer removes if-loop
         iequal_inst = find_result_id(module.instructions, rd_cbr[1].get_src())
         disable_iequal(module, iequal_inst)
@@ -382,21 +405,6 @@ def apply_reduce(module, reduce_insts):
         # Replace read from shared memory with subgroup reduce
         module.set(rd_n, Inst.make_reduce(
             op_inst.get_src(), rd_inst.get_dst(), op, data_type))
-
-        '''
-        # Disable read from shared memory
-        module.disable(rd_n)
-
-        # Add subgroup reduce outside thread block
-        label_inst = find_br_dst(module.instructions, rd_cbr[1].get_dst()[1])
-        loc = label_inst[0] + 1
-        module.insert(loc, Inst.make_reduce(
-            op_inst.get_src(), rd_inst.get_dst(), op, data_type))
-
-        st_dst_inst = find_st(module.instructions, rd_inst.get_dst())
-        ac_inst = find_result_id(module.instructions, st_dst_inst[1].get_dst())
-        module.move(*ac_inst, loc + 1)
-        module.move(*st_dst_inst, loc + 2)
         '''
 
 def main():
