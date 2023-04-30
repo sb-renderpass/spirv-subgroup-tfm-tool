@@ -1,0 +1,93 @@
+; SPIR-V
+; Version: 1.6
+; Generator: Google Shaderc over Glslang; 11
+; Bound: 49
+; Schema: 0
+               OpCapability Shader
+          %1 = OpExtInstImport "GLSL.std.450"
+               OpMemoryModel Logical GLSL450
+               OpEntryPoint GLCompute %main "main" %gl_LocalInvocationID %s_value %_ %__0
+               OpExecutionModeId %main LocalSizeId %uint_1 %uint_1 %uint_1
+               OpSource GLSL 460
+               OpSourceExtension "GL_GOOGLE_cpp_style_line_directive"
+               OpSourceExtension "GL_GOOGLE_include_directive"
+               OpName %main "main"
+               OpName %gl_LocalInvocationID "gl_LocalInvocationID"
+               OpName %s_value "s_value"
+               OpName %in_value_buffer "in_value_buffer"
+               OpMemberName %in_value_buffer 0 "in_value"
+               OpName %_ ""
+               OpName %out_value_buffer "out_value_buffer"
+               OpMemberName %out_value_buffer 0 "out_value"
+               OpName %__0 ""
+               OpDecorate %gl_LocalInvocationID BuiltIn LocalInvocationId
+               OpDecorate %_runtimearr_int ArrayStride 4
+               OpMemberDecorate %in_value_buffer 0 NonWritable
+               OpMemberDecorate %in_value_buffer 0 Offset 0
+               OpDecorate %in_value_buffer Block
+               OpDecorate %_ DescriptorSet 0
+               OpDecorate %_ Binding 0
+               OpDecorate %_runtimearr_int_0 ArrayStride 4
+               OpMemberDecorate %out_value_buffer 0 NonReadable
+               OpMemberDecorate %out_value_buffer 0 Offset 0
+               OpDecorate %out_value_buffer Block
+               OpDecorate %__0 DescriptorSet 0
+               OpDecorate %__0 Binding 1
+       %void = OpTypeVoid
+          %3 = OpTypeFunction %void
+       %uint = OpTypeInt 32 0
+     %uint_1 = OpConstant %uint 1
+     %v3uint = OpTypeVector %uint 3
+%_ptr_Input_v3uint = OpTypePointer Input %v3uint
+%gl_LocalInvocationID = OpVariable %_ptr_Input_v3uint Input
+     %uint_0 = OpConstant %uint 0
+%_ptr_Input_uint = OpTypePointer Input %uint
+    %uint_11 = OpConstant %uint 11
+       %bool = OpTypeBool
+        %int = OpTypeInt 32 1
+%_ptr_Workgroup_int = OpTypePointer Workgroup %int
+    %s_value = OpVariable %_ptr_Workgroup_int Workgroup
+      %int_0 = OpConstant %int 0
+     %uint_2 = OpConstant %uint 2
+  %uint_3400 = OpConstant %uint 3400
+%_runtimearr_int = OpTypeRuntimeArray %int
+%in_value_buffer = OpTypeStruct %_runtimearr_int
+%_ptr_StorageBuffer_in_value_buffer = OpTypePointer StorageBuffer %in_value_buffer
+          %_ = OpVariable %_ptr_StorageBuffer_in_value_buffer StorageBuffer
+%_ptr_StorageBuffer_int = OpTypePointer StorageBuffer %int
+%_runtimearr_int_0 = OpTypeRuntimeArray %int
+%out_value_buffer = OpTypeStruct %_runtimearr_int_0
+%_ptr_StorageBuffer_out_value_buffer = OpTypePointer StorageBuffer %out_value_buffer
+        %__0 = OpVariable %_ptr_StorageBuffer_out_value_buffer StorageBuffer
+     %int_11 = OpConstant %int 11
+         %48 = OpConstantComposite %v3uint %uint_1 %uint_1 %uint_1
+       %main = OpFunction %void None %3
+          %5 = OpLabel
+         %13 = OpAccessChain %_ptr_Input_uint %gl_LocalInvocationID %uint_0
+         %14 = OpLoad %uint %13
+         %17 = OpIEqual %bool %14 %uint_11
+               OpSelectionMerge %19 None
+               OpBranchConditional %17 %18 %19
+         %18 = OpLabel
+               OpStore %s_value %int_0
+               OpBranch %19
+         %19 = OpLabel
+               OpMemoryBarrier %uint_2 %uint_3400
+         %30 = OpAccessChain %_ptr_Input_uint %gl_LocalInvocationID %uint_0
+         %31 = OpLoad %uint %30
+         %33 = OpAccessChain %_ptr_StorageBuffer_int %_ %int_0 %31
+         %34 = OpLoad %int %33
+         %35 = OpAtomicIAdd %int %s_value %uint_1 %uint_0 %34
+         %36 = OpAccessChain %_ptr_Input_uint %gl_LocalInvocationID %uint_0
+         %37 = OpLoad %uint %36
+         %38 = OpIEqual %bool %37 %uint_11
+               OpSelectionMerge %40 None
+               OpBranchConditional %38 %39 %40
+         %39 = OpLabel
+         %46 = OpLoad %int %s_value
+         %47 = OpAccessChain %_ptr_StorageBuffer_int %__0 %int_0 %int_11
+               OpStore %47 %46
+               OpBranch %40
+         %40 = OpLabel
+               OpReturn
+               OpFunctionEnd

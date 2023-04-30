@@ -1,0 +1,20 @@
+#version 460
+#extension GL_KHR_shader_subgroup_arithmetic : require
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(set = 0, binding = 0, std430) readonly buffer in_value_buffer
+{
+    int in_value[];
+} _7;
+
+layout(set = 0, binding = 1, std430) writeonly buffer out_value_buffer
+{
+    int out_value[];
+} _8;
+
+void main()
+{
+    groupMemoryBarrier();
+    _8.out_value[11] = subgroupAdd(_7.in_value[gl_LocalInvocationID.x]);
+}
+

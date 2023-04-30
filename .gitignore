@@ -1,4 +1,4 @@
 broadcast/*
 reduce/*
-!broadcast/before.comp
-!reduce/before.comp
+tests/!broadcast/before.comp
+tests/!reduce/before.comp
