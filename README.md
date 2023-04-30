@@ -1,6 +1,4 @@
-# CS6245 Parallelizing Compilers: Final project
-
-## GPU shader optimization via automatic SPIRV subgroup transformations
+# GPU shader optimization via automatic SPIRV subgroup transformations
 
 ### Broadcast
 
@@ -42,7 +40,17 @@ $ python run.py filename [--validate | --no-validate] [--optimize | --no-optimiz
 
 ### Examples
 
+#### Show cross-compiled GLSL source
+
 ```
 $ python run.py broadcast/before.comp --show
 $ python run.py reduce/before.comp --show
 ```
+
+#### Perform validation checks
+
+```
+$ python run.py broadcast/before.comp --validate
+$ python run.py reduce/before.comp --validate
+```
+
