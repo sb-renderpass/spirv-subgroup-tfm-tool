@@ -4,11 +4,21 @@
 
 ### Broadcast
 
-![broadcast](images/apply_broadcast_annotated.png)
+![broadcast SPIRV assembly](images/apply_broadcast_spvasm_annotated.png)
+SPIRV assembly transformations with color highlights.
+Red: deleted, green: moved, and blue: replaced.
+
+![broadcast GLSL](images/apply_broadcast_annotated.png)
+Generated GLSL code produced by the SPIRV cross-compiler.
 
 ### Reduce
 
-![reduce](images/apply_reduce_annotated.png)
+![reduce SPIRV assembly](images/apply_reduce_spvasm_annotated.png)
+SPIRV assembly transformations with color highlights.
+Red: deleted, green: moved, and blue: moved + replaced.
+
+![reduce GLSL](images/apply_reduce_annotated.png)
+Generated GLSL code produced by the SPIRV cross-compiler.
 
 ## Requirements
 
