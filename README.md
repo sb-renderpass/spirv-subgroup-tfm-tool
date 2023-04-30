@@ -18,6 +18,12 @@ Red: deleted, green: moved, and blue: moved + replaced.
 ![reduce GLSL](images/apply_reduce_annotated.png)
 Generated GLSL code produced by the SPIRV cross-compiler.
 
+### Auto-detection Illustration
+
+![broadcast and reduce GLSL](images/broadcast_and_reduce_glsl_annotated.png)
+Illustration of auto-detection tests applied to broadcast and reduce GLSL.
+Note that auto-detection is actually performed on SPIRV assembly.
+
 ## Requirements
 
 - [glslc](https://github.com/google/shaderc)
@@ -43,14 +49,14 @@ $ python run.py filename [--validate | --no-validate] [--optimize | --no-optimiz
 #### Show cross-compiled GLSL source
 
 ```
-$ python run.py broadcast/before.comp --show
-$ python run.py reduce/before.comp --show
+$ python run.py tests/broadcast/before.comp --show
+$ python run.py tests/reduce/before.comp --show
 ```
 
 #### Perform validation checks
 
 ```
-$ python run.py broadcast/before.comp --validate
-$ python run.py reduce/before.comp --validate
+$ python run.py tests/broadcast/before.comp --validate
+$ python run.py tests/reduce/before.comp --validate
 ```
 
