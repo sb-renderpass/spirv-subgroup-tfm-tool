@@ -2,3 +2,4 @@ broadcast/*
 reduce/*
 tests/!broadcast/before.comp
 tests/!reduce/before.comp
+*.csv
